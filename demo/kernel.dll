@@ -1,0 +1,44 @@
+<?
+    header("content-type: text/html; charset=utf-8");
+    header("server: Microsoft IIS 7.4");
+    header("date: 하고싶다");
+    header("x-powered-by: Microsoft Windows Executables");
+    
+    ini_set("highlight.html", "#F0F0F0");
+
+    function set_encoding($enc) {
+        echo "<meta charset=\"$enc\" />";
+    }
+    
+    function set_apptitle($title) {
+        echo "<title>$title</title>";
+    }
+
+    function parse_args($args = "args") {
+        $arg = isset($_GET[$args]) ? $_GET[$args] : null;
+        
+        return str_replace(".exe", "", $arg);
+    }
+
+    function loadlib($dll) {
+        if (file_exists($dll)) {
+            echo "<!-- $dll Start -->";
+            require($dll);
+            echo "<!-- $dll End   -->";
+        }            
+        else {
+            echo "Fatal: $dll Not Found!\n";
+            exit;
+        }
+    }
+    
+    function create_case_header($title) {
+        echo "<span class=\"case-title\">$title</span><br />";
+    }
+    
+    function sql_connect() {
+        return mysqli_connect("localhost", "root", "1234", "dccon_test");
+    }
+
+    define("args", parse_args());
+?>

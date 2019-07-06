@@ -1,0 +1,50 @@
+<?
+    require ("kernel.dll");
+    header  ("content-type: text/plain");
+
+    $conn = sql_connect();
+?>
+<? create_case_header("Sample Testing Code") ?>
+<?=highlight_string(
+'$time = microtime(true);
+for ($idx=0; $idx<10000; ++$idx) {
+    /* Codes Here */
+}
+$result = microtime(true) - $time;
+echo (round($result, 3) * 1000) . " ms";
+', true)?> <br /> <br />
+!---!
+<? create_case_header("With Prepared Statement") ?>
+<?=highlight_string(
+'$stmt = mysqli_prepare($conn, "SELECT * FROM samp_tbl WHERE idx=?");
+$stmt->bind_param("i", $idx);
+$stmt->execute();
+$stmt->close();', true)?> <br /> <br />
+-!!!-
+<? create_case_header("Concatenated Query") ?>
+<?=highlight_string(
+'mysqli_query($conn, "SELECT * FROM samp_tbl WHERE idx=$idx");', true)?> <br /> <br />
+!---!
+<? create_case_header("With Prepared Statement") ?>
+<?
+    $time = microtime(true);
+    for ($idx = 0; $idx < 10000; ++$idx) {
+        $stmt = mysqli_prepare($conn, "SELECT * FROM samp_tbl WHERE idx=?");
+        $stmt->bind_param("i", $idx);
+
+        $stmt->execute(); 
+        $stmt->close();
+    }
+    $result = microtime(true) - $time;
+    echo (round($result, 3) * 1000) . " ms";
+?>
+<br /><br />
+<? create_case_header("Concatenated Query") ?>
+<?
+    $time = microtime(true);
+    for ($idx = 0; $idx < 10000; ++$idx) {
+        mysqli_query($conn, "SELECT * FROM samp_tbl WHERE idx=$idx");
+    }
+    $result = microtime(true) - $time;
+    echo (round($result, 3) * 1000) . " ms";
+?>

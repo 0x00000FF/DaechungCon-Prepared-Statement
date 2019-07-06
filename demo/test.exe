@@ -1,0 +1,35 @@
+<?
+    require ("kernel.dll");
+?>
+
+<!doctype html>
+<html>
+    <head>
+        <? 
+            set_encoding("utf-8");
+            set_apptitle("P.노우렛지's 대충콘 시연 프레임워크");
+        
+            loadlib("test.dll");
+            loadlib("test_gui.dll"); 
+        ?>
+    </head>
+    <body>
+        <header>
+            <h3>DaeChoongCon@CNU Demo Terminal</h3>
+            <p>[pknowledge@argos.or.kr]# <span id="arg"><?=trim(args)?></span></p>
+        </header>
+        
+        <article>
+            <section id="left">
+                Executing
+            </section>
+            <section id="right">
+                Executing
+            </section>
+        </article>
+        
+        <footer>
+            Command is being processed in server...
+        </footer>
+    </body>
+</html>

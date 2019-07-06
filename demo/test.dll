@@ -1,0 +1,47 @@
+<script type="text/javascript" src="/jquery.js"></script>
+<script>
+    (function ($) {
+        function updateStatusBar(color, message) {
+            $("footer").css("background-color", color);
+            $("footer").text(message);
+        }
+        
+        function updatePanel(left, right) {
+            if (left)
+                $("#left").html(left);
+            
+            if (right)
+                $("#right").html(right);
+        }
+        
+        $(function () {
+            const pleft  = $("#left");
+            const pright = $("#right");
+            const arg    = $("#arg").text()
+                                    .trim();
+            
+            if (arg.length === 0) {
+                updateStatusBar("#f01010", "No arguments were provided");
+                updatePanel("Error", "Error");
+                return;
+            }
+            
+            $.get("/exec/" + arg)
+             .done(function (data) {
+                var pages = data.split("!---!");
+                updatePanel(pages[0]);
+                
+                var left_codes = pages[1].split("-!!!-");
+                updatePanel(pleft.html() + left_codes[0]);
+                updatePanel(pleft.html() + left_codes[1], pages[2]);
+                
+                updateStatusBar("#4040FF", "Command successful");
+             })
+             .fail(function (err) {
+                 console.log(err);
+                updateStatusBar("#f01010", "Failed to retrieve data from requested process");
+                updatePanel("Error", "Error");
+             });
+        });
+    })(jQuery);
+</script>
